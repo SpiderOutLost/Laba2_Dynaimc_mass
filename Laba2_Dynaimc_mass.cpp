@@ -117,25 +117,14 @@ public:
 	}
 };
 class DiagonalMatrix {
-public:
-	int** Matrix;
-	int* Index;
-	
-	int** Pack(size_t rows, size_t col) {
-		int** Matrix = new int* [rows];
-		for (int i = 0; i < rows; i++)
-		{
-			Matrix[i] = new int[col];
+private:
+	size_t cols = 0;
+	size_t rowses = 0;
 
-		}
-		for (int i = 0; i < rows; i++)
-		{
-			for (int j = 0; j < col; j++)
-			{
-				cout << i + 1 << j + 1 << "\t";
-				cin >> Matrix[i][j];
-			}
-		}
+public:
+
+	int** Pack(int** Matrix, size_t rows, size_t col) {
+
 		for (int i = 0; i < rows; i++)
 		{
 			for (int j = 0; j < col; j++)
@@ -246,47 +235,56 @@ public:
 			{
 				for (int j = index; j < rows; j++)
 				{
-
 					Packmatrix[i][j - index] = Matrix[j - index][j];
 
 				}
 			}
 		}
-		return Packmatrix;
-
-	}
-	~DiagonalMatrix(){
-		delete[] Matrix;
-	
-	}
-};
-template <size_t rows, size_t col>
-pair <size_t, size_t> getMatrixSize(int(&Packmatrix)[rows][col]) {
-	return { rows, col };
-}
-int** AdditionMatrix(int** Packmatrix1, int** Packmatrix2, size_t rows1, size_t col1, size_t rows2, size_t col2) {
-
-	if (rows1 == rows2 && col1 == col2) {
-		int** Matrix3 = new int* [rows1];
-		for (int i = 0; i < rows1; i++)
+		cols = m;
+		rowses = rows;
+		for (int i = 0; i < rows; i++)
 		{
-			Matrix3[i] == new int[col1];
+			delete[] Matrix[i];
 		}
-
-		for (int i = 0; i < rows1; i++)
+		delete[] Matrix;
+		return Packmatrix;
+	}
+	int Rows() {
+		return rowses;
+	}
+	int Col() {
+		return cols;
+	}
+	
+};
+int Getdata(int** Matrix, int i, int j) {
+	return Matrix[i][j];
+}
+int** SumOfMatrix(int** Matrix1, int** Matrix2, int row1, int col1, int row2, int col2) {
+	if (row1 == row2 && col1 == col2) {
+		int** m3 = new int* [row1];
+		for (int i = 0; i < row1; i++)
+		{
+			m3[i] = new int[col1];
+		}
+		for (int i = 0; i < row1; i++)
 		{
 			for (int j = 0; j < col1; j++)
 			{
-				Matrix3[i][j] = Packmatrix1[i][j] + Packmatrix2[i][j];
+				m3[i][j] = Getdata(Matrix1, i, j) + Getdata(Matrix2, i, j);
+
 			}
 		}
-		return Matrix3;
+		return m3;
 	}
 	else
 	{
 		cout << "Матрицы разного размера";
 	}
 }
+#include <iostream>
+using namespace std;
+
 class CCSMatrix {
 public:
 	int* A;
@@ -297,27 +295,24 @@ public:
 	CCSMatrix(int** Matrix, size_t rows, size_t col) {
 		this->rows = rows;
 		this->col = col;
+		Init(Matrix);
 	}
-	void Inin(const int** const Matrix) {
-		int a = 0;
-		for (int i = 0; i < rows; i++)
-		{
-			for (int j = 0; j < col; j++)
-			{
+	void Init(int** Matrix) {
+		a = 0;
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < col; j++) {
 				if (Matrix[i][j] != 0) {
 					a++;
 				}
 			}
 		}
-		int* A = new int[a];
-		int* LI = new int[rows * a];
-		int* LJ = new int[rows + 1];
+		A = new int[a];
+		LI = new int[a];
+		LJ = new int[col + 1];
 		LJ[0] = 0;
 		int k = 0;
-		for (int j = 0; j < col; j++)
-		{
-			for (int i = 0; i < rows; i++)
-			{
+		for (int j = 0; j < col; j++) {
+			for (int i = 0; i < rows; i++) {
 				if (Matrix[i][j] != 0) {
 					A[k] = Matrix[i][j];
 					LI[k] = i;
@@ -327,35 +322,44 @@ public:
 			LJ[j + 1] = k;
 		}
 	}
-	int GetElement(int i, int j) {
-	
-		int N1 = LI[i];
-		int N2 = LI[i + 1];
-		for (int k = N1; k < N2; k++)
-		{
-			if (LJ[k] == j)
-			{
+	int GetElement(int i, int j) const {
+		for (int k = LJ[j]; k < LJ[j + 1]; k++) {
+			if (LI[k] == i) {
 				return A[k];
-				
 			}
 		}
+		return 0;
 	}
 	void Print() {
-		for (int i = 0; i < rows; i++)
-		{
-			for (int j = 0; j < col; j++)
-			{
-				cout << GetElement(i, j), "t";
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < col; j++) {
+				cout << GetElement(i, j) << "\t";
 			}
 			cout << endl;
 		}
 	}
+	void PrintCCS() {
+		cout << "Values: ";
+		for (int i = 0; i < a; i++) {
+			cout << A[i] << " ";
+		}
+		cout << endl;
+		cout << "Row Indices: ";
+		for (int i = 0; i < a; i++) {
+			cout << LI[i] << " ";
+		}
+		cout << endl;
+		cout << "Column Pointers: ";
+		for (int j = 0; j <= col; j++) {
+			cout << LJ[j] << " ";
+		}
+		cout << endl;
+	}
 };
+
 
 int main() {
 	setlocale(LC_ALL, "Rus");
-	DiagonalMatrix Matrix1;
-	DiagonalMatrix Matrix2;
 	ifstream file("matrixes.txt");
 	if (!file) {
 		cout << "Не удалось открыть файл" << std::endl;
@@ -369,24 +373,39 @@ int main() {
 		matrix1[i] = new int[n1];
 	}
 	ReadMatrix(file, matrix1, n1);
+
 	int n2;
 	file >> n2;
 	int** matrix2 = new int* [n2];
 	for (int i = 0; i < n2; i++)
 	{
 		matrix2[i] = new int[n2];
+		
 	}
 	ReadMatrix(file, matrix2, n2);
+	
 	file.close();
-	DiagonalMatrix m1{matrix1};
-	m1.Pack(n1, n1);
-	DiagonalMatrix m2{ matrix2 };
-	m2.Pack(n2, n2);
-	auto size = 
-	/*Matrix1.Create_and_Pack(3, 3);
-	Matrix2.Create_and_Pack(3, 3);
-	int** Matrix = AdditionMatrix(Matrix1.Create_and_Pack(3, 3), Matrix2.Create_and_Pack(3, 3), 3,3,3,3);
-	CCSMatrix(Matrix, 3,3);*/
+	DiagonalMatrix m1;
+	DiagonalMatrix m2;
+	int**m1Pack = m1.Pack(matrix1, n1, n1);
+	int** m2Pack = m2.Pack(matrix2, n2, n2);
+	
+	int** m3 = SumOfMatrix(m1Pack, m2Pack, m1.Rows(), m1.Col(), m2.Rows(), m2.Col());
+	for (int i = 0; i < m1.Rows(); i++)
+	{
+		for (int j = 0; j < m1.Col(); j++)
+		{
+			cout << Getdata(m3, i, j);
+		}
+		cout << "\n";
+	}
+	cout << "\n";
+	size_t Rows_CCS = m1.Rows();
+	size_t Cols_CCS = m1.Col();
+
+	CCSMatrix m_ccs { m3, Rows_CCS, Cols_CCS};
+	m_ccs.Init(m3);
+	m_ccs.PrintCCS();
 	return 0;
 }
 
